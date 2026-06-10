@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 560">
+  <rect x="0" y="0" width="320" height="400" fill="#fde4ef"/>
+  <g fill="#f9c4da">
+    <path transform="translate(34,250)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(286,238) scale(0.9)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(262,330) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(48,330) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(160,235) scale(0.9)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(40,150) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    <path transform="translate(282,150) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+  </g>
+  <rect x="0" y="400" width="320" height="160" fill="#fbd9e6"/>
+  <line x1="0" y1="400" x2="320" y2="400" stroke="#1f1c1e" stroke-width="4"/>
+  <g id="garland">
+    <path d="M0 22 Q160 44 320 18" fill="none" stroke="#1f1c1e" stroke-width="3"/>
+    <path d="M20 24 L44 25 L32 48 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M85 30 L109 31 L97 54 Z" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M150 32 L174 32 L162 56 Z" fill="rgb(190,228,245)" stroke="#1f1c1e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M215 30 L239 29 L227 53 Z" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M280 25 L304 23 L292 47 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <g id="window">
+    <rect x="88" y="80" width="144" height="120" rx="6" fill="#ffffff" stroke="#1f1c1e" stroke-width="5"/>
+    <rect x="96" y="88" width="128" height="104" fill="#dcf0fb"/>
+    <line x1="160" y1="88" x2="160" y2="192" stroke="#1f1c1e" stroke-width="3"/>
+    <line x1="96" y1="140" x2="224" y2="140" stroke="#1f1c1e" stroke-width="3"/>
+    <path d="M84 74 Q160 96 236 74 L236 90 Q160 112 84 90 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M84 74 Q96 140 86 204 L102 204 Q110 140 100 78 Z" fill="rgb(253,214,232)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M236 74 Q224 140 234 204 L218 204 Q210 140 220 78 Z" fill="rgb(253,214,232)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="93" cy="150" r="6" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="3"/>
+    <circle cx="227" cy="150" r="6" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="3"/>
+  </g>
+  <g id="lamp">
+    <line x1="52" y1="320" x2="52" y2="455" stroke="#1f1c1e" stroke-width="4"/>
+    <path d="M36 460 L68 460 L64 449 L40 449 Z" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <path transform="translate(52,302) scale(2.2)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="1.8"/>
+  </g>
+  <g id="bed">
+    <rect x="272" y="390" width="26" height="76" rx="12" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4"/>
+    <rect x="170" y="440" width="122" height="46" rx="10" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="4"/>
+    <path d="M170 450 Q170 440 180 440 L250 440 L250 486 L170 486 Z" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M250 440 Q242 452 250 463 Q258 475 250 486" fill="none" stroke="#ffffff" stroke-width="3"/>
+    <path transform="translate(268,434) scale(2)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z" fill="#ffffff" stroke="#1f1c1e" stroke-width="1.6"/>
+  </g>
+  <g id="rug">
+    <path transform="translate(105,512) scale(5.5)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="0.8"/>
+  </g>
+  <g id="plush">
+    <circle cx="40" cy="510" r="15" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="4"/>
+    <ellipse cx="33" cy="493" rx="4.5" ry="11" transform="rotate(-14 33 493)" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="3.5"/>
+    <ellipse cx="47" cy="493" rx="4.5" ry="11" transform="rotate(14 47 493)" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="3.5"/>
+    <circle cx="35" cy="507" r="2.2" fill="#1f1c1e"/>
+    <circle cx="45" cy="507" r="2.2" fill="#1f1c1e"/>
+    <path d="M37 514 Q40 517 43 514" fill="none" stroke="#1f1c1e" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

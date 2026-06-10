@@ -1,0 +1,66 @@
+// たべものワールド 50語(英検5級相当の食べ物語彙)
+const WORDS = [
+  { id: 1,  en: 'apple',      ja: 'りんご',         e: '🍎', ph: 'I eat an apple.' },
+  { id: 2,  en: 'banana',     ja: 'ばなな',         e: '🍌', ph: 'I like bananas.' },
+  { id: 3,  en: 'grape',      ja: 'ぶどう',         e: '🍇', ph: 'Grapes are sweet.' },
+  { id: 4,  en: 'strawberry', ja: 'いちご',         e: '🍓', ph: 'I love strawberries.' },
+  { id: 5,  en: 'peach',      ja: 'もも',           e: '🍑', ph: 'The peach is soft.' },
+  { id: 6,  en: 'orange',     ja: 'おれんじ',       e: '🍊', ph: 'I eat an orange.' },
+  { id: 7,  en: 'lemon',      ja: 'れもん',         e: '🍋', ph: 'The lemon is sour.' },
+  { id: 8,  en: 'melon',      ja: 'めろん',         e: '🍈', ph: 'The melon is big.' },
+  { id: 9,  en: 'watermelon', ja: 'すいか',         e: '🍉', ph: 'Watermelon is yummy.' },
+  { id: 10, en: 'cherry',     ja: 'さくらんぼ',     e: '🍒', ph: 'Cherries are red.' },
+  { id: 11, en: 'milk',       ja: 'ぎゅうにゅう',   e: '🥛', ph: 'I drink milk.' },
+  { id: 12, en: 'water',      ja: 'みず',           e: '💧', ph: 'I drink water.' },
+  { id: 13, en: 'juice',      ja: 'じゅーす',       e: '🧃', ph: 'I like juice.' },
+  { id: 14, en: 'tea',        ja: 'おちゃ',         e: '🍵', ph: 'The tea is hot.' },
+  { id: 15, en: 'bread',      ja: 'ぱん',           e: '🍞', ph: 'I eat bread.' },
+  { id: 16, en: 'rice',       ja: 'ごはん',         e: '🍚', ph: 'I eat rice.' },
+  { id: 17, en: 'egg',        ja: 'たまご',         e: '🥚', ph: 'I like eggs.' },
+  { id: 18, en: 'cheese',     ja: 'ちーず',         e: '🧀', ph: 'Cheese is yummy.' },
+  { id: 19, en: 'cake',       ja: 'けーき',         e: '🍰', ph: 'I love cake.' },
+  { id: 20, en: 'cookie',     ja: 'くっきー',       e: '🍪', ph: 'Cookies are sweet.' },
+  { id: 21, en: 'candy',      ja: 'あめ',           e: '🍬', ph: 'I like candy.' },
+  { id: 22, en: 'chocolate',  ja: 'ちょこれーと',   e: '🍫', ph: 'I love chocolate.' },
+  { id: 23, en: 'ice cream',  ja: 'あいすくりーむ', e: '🍦', ph: 'Ice cream is cold.' },
+  { id: 24, en: 'pizza',      ja: 'ぴざ',           e: '🍕', ph: 'I eat pizza.' },
+  { id: 25, en: 'hamburger',  ja: 'はんばーがー',   e: '🍔', ph: 'I like hamburgers.' },
+  { id: 26, en: 'sandwich',   ja: 'さんどいっち',   e: '🥪', ph: 'I make a sandwich.' },
+  { id: 27, en: 'soup',       ja: 'すーぷ',         e: '🍲', ph: 'The soup is hot.' },
+  { id: 28, en: 'salad',      ja: 'さらだ',         e: '🥗', ph: 'I eat salad.' },
+  { id: 29, en: 'fish',       ja: 'さかな',         e: '🐟', ph: 'I eat fish.' },
+  { id: 30, en: 'meat',       ja: 'おにく',         e: '🍖', ph: 'I like meat.' },
+  { id: 31, en: 'chicken',    ja: 'とりにく',       e: '🍗', ph: 'I eat chicken.' },
+  { id: 32, en: 'potato',     ja: 'じゃがいも',     e: '🥔', ph: 'I like potatoes.' },
+  { id: 33, en: 'tomato',     ja: 'とまと',         e: '🍅', ph: 'Tomatoes are red.' },
+  { id: 34, en: 'carrot',     ja: 'にんじん',       e: '🥕', ph: 'Rabbits like carrots.' },
+  { id: 35, en: 'onion',      ja: 'たまねぎ',       e: '🧅', ph: 'I cut an onion.' },
+  { id: 36, en: 'corn',       ja: 'とうもろこし',   e: '🌽', ph: 'Corn is yellow.' },
+  { id: 37, en: 'pumpkin',    ja: 'かぼちゃ',       e: '🎃', ph: 'The pumpkin is big.' },
+  { id: 38, en: 'mushroom',   ja: 'きのこ',         e: '🍄', ph: 'I see a mushroom.' },
+  { id: 39, en: 'donut',      ja: 'どーなつ',       e: '🍩', ph: 'I love donuts.' },
+  { id: 40, en: 'pancake',    ja: 'ほっとけーき',   e: '🥞', ph: 'I eat pancakes.' },
+  { id: 41, en: 'honey',      ja: 'はちみつ',       e: '🍯', ph: 'Honey is sweet.' },
+  { id: 42, en: 'butter',     ja: 'ばたー',         e: '🧈', ph: 'Butter is soft.' },
+  { id: 43, en: 'pie',        ja: 'ぱい',           e: '🥧', ph: 'I bake a pie.' },
+  { id: 44, en: 'kiwi',       ja: 'きうい',         e: '🥝', ph: 'Kiwis are green.' },
+  { id: 45, en: 'pineapple',  ja: 'ぱいなっぷる',   e: '🍍', ph: 'I like pineapples.' },
+  { id: 46, en: 'mango',      ja: 'まんごー',       e: '🥭', ph: 'Mangoes are sweet.' },
+  { id: 47, en: 'cucumber',   ja: 'きゅうり',       e: '🥒', ph: 'Cucumbers are green.' },
+  { id: 48, en: 'broccoli',   ja: 'ぶろっこりー',   e: '🥦', ph: 'I eat broccoli.' },
+  { id: 49, en: 'popcorn',    ja: 'ぽっぷこーん',   e: '🍿', ph: 'I eat popcorn.' },
+  { id: 50, en: 'noodles',    ja: 'らーめん',       e: '🍜', ph: 'Noodles are long.' }
+];
+
+// ステージ構成: 1〜5は10語ずつ、6番目はボス(総復習)
+const STAGES = [
+  { name: 'くだもの の みち',     type: 'catch', ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+  { name: 'あさごはん の おか',   type: 'match', ids: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
+  { name: 'おやつ の いずみ',     type: 'catch', ids: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30] },
+  { name: 'やさい の はたけ',     type: 'match', ids: [31, 32, 33, 34, 35, 36, 37, 38, 39, 40] },
+  { name: 'ごちそう の もり',     type: 'catch', ids: [41, 42, 43, 44, 45, 46, 47, 48, 49, 50] },
+  { name: 'ボス: たべものの女王', type: 'boss',  ids: [] }
+];
+
+// SRS: 習熟度m(1〜5)に応じた次回復習までの日数
+const SRS_DAYS = [0, 1, 3, 7, 14, 30];

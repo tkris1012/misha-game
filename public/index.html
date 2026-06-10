@@ -1,35 +1,205 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>みしゃゲーム 🎀 じゅんびちゅう</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(160deg, #ffe3ef 0%, #f3e3ff 60%, #e3f5ff 100%);
-      font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-      color: #b35c8d;
-      text-align: center;
-    }
-    .heart { font-size: 64px; animation: bounce 1.6s ease-in-out infinite; }
-    h1 { font-size: 32px; margin: 16px 0 8px; }
-    p { font-size: 18px; margin: 4px 0; }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-14px); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#fdeef5">
+<title>みしゃゲーム 🦄 えいごのことばあつめ</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="heart">💖</div>
-  <h1>みしゃゲーム</h1>
-  <p>いま じゅんびちゅうだよ 🎀</p>
-  <p>もうすこし まっててね!</p>
+<div id="app">
+
+  <!-- ホーム -->
+  <section id="screen-home" class="screen">
+    <img id="room-bg" src="assets/room1.svg" alt="おへや">
+    <div class="topbar">
+      <span class="chip">🍬 <span id="ui-candy">0</span></span>
+      <span class="chip">📚 <span id="ui-words">0</span>/50</span>
+      <button class="chip chip-btn" id="btn-sound">🔊</button>
+    </div>
+    <div id="mission-chip">ことばのみを あつめて たべさせよう! 🎯</div>
+    <div id="bubble" hidden>Good morning!</div>
+
+    <div id="partner-area">
+      <!-- たまご -->
+      <svg id="egg-svg" class="anim-rock" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="eggclip"><path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z"/></clipPath></defs>
+        <ellipse cx="160" cy="290" rx="72" ry="12" fill="#f3d8e6"/>
+        <path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z" fill="#fdfdfd"/>
+        <g clip-path="url(#eggclip)">
+          <path d="M70 168 L98 148 L126 168 L154 148 L182 168 L210 148 L238 168 L254 156" fill="none" stroke="rgb(218,193,231)" stroke-width="13" stroke-linejoin="round"/>
+          <g fill="rgb(252,195,217)">
+            <path transform="translate(122,96) scale(1.3)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+            <path transform="translate(196,78)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+            <path transform="translate(160,124) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+          </g>
+          <g fill="rgb(190,228,245)">
+            <circle cx="104" cy="212" r="8"/><circle cx="160" cy="230" r="8"/><circle cx="216" cy="206" r="8"/>
+          </g>
+          <g fill="rgb(252,235,170)">
+            <path transform="translate(136,254)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"/>
+            <path transform="translate(198,244) scale(0.8)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"/>
+          </g>
+        </g>
+        <path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z" fill="none" stroke="#1f1c1e" stroke-width="5"/>
+        <g id="egg-crack" style="display:none">
+          <path d="M138 58 L150 76 L140 92 L154 104" fill="none" stroke="#1f1c1e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M176 52 L170 70 L182 82" fill="none" stroke="#1f1c1e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </svg>
+
+      <!-- ベビー(表情つき) -->
+      <svg id="baby-svg" class="anim-float" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <ellipse cx="160" cy="306" rx="80" ry="11" fill="#f3d8e6"/>
+        <circle cx="230" cy="252" r="16" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="5"/>
+        <circle cx="233" cy="250" r="7" fill="rgb(252,235,170)"/>
+        <ellipse cx="160" cy="260" rx="64" ry="42" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+        <rect x="118" y="268" width="26" height="34" rx="12" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+        <rect x="176" y="268" width="26" height="34" rx="12" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+        <path d="M118 290 a13 8 0 0 1 26 0 a13 8 0 0 1 -26 0 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4"/>
+        <path d="M176 290 a13 8 0 0 1 26 0 a13 8 0 0 1 -26 0 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4"/>
+        <g transform="rotate(-30 86 82)">
+          <ellipse cx="86" cy="82" rx="15" ry="24" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+          <ellipse cx="86" cy="86" rx="7" ry="13" fill="rgb(253,214,232)"/>
+        </g>
+        <g transform="rotate(30 234 82)">
+          <ellipse cx="234" cy="82" rx="15" ry="24" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+          <ellipse cx="234" cy="86" rx="7" ry="13" fill="rgb(253,214,232)"/>
+        </g>
+        <circle cx="160" cy="150" r="92" fill="#fdfdfd" stroke="#1f1c1e" stroke-width="5"/>
+        <path d="M160 14 L177 60 Q160 68 143 60 Z" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M150 48 L172 42" stroke="#e3c25f" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="116" cy="85" rx="23" ry="32" transform="rotate(30 116 85)" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="5"/>
+        <ellipse cx="204" cy="85" rx="23" ry="32" transform="rotate(-30 204 85)" fill="rgb(190,228,245)" stroke="#1f1c1e" stroke-width="5"/>
+        <ellipse cx="160" cy="75" rx="27" ry="30" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="5"/>
+        <ellipse cx="84" cy="200" rx="15" ry="9" fill="rgb(252,195,217)" opacity="0.9"/>
+        <ellipse cx="236" cy="200" rx="15" ry="9" fill="rgb(252,195,217)" opacity="0.9"/>
+        <g id="px-eyes-open" class="px">
+          <ellipse cx="120" cy="162" rx="15" ry="19" fill="#1f1c1e"/>
+          <circle cx="114" cy="154" r="5.5" fill="#ffffff"/><circle cx="126" cy="170" r="2.5" fill="#ffffff"/>
+          <ellipse cx="200" cy="162" rx="15" ry="19" fill="#1f1c1e"/>
+          <circle cx="194" cy="154" r="5.5" fill="#ffffff"/><circle cx="206" cy="170" r="2.5" fill="#ffffff"/>
+        </g>
+        <g id="px-eyes-blink" class="px" style="display:none">
+          <path d="M105 163 Q120 170 135 163" fill="none" stroke="#1f1c1e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M185 163 Q200 170 215 163" fill="none" stroke="#1f1c1e" stroke-width="5" stroke-linecap="round"/>
+        </g>
+        <g id="px-eyes-happy" class="px" style="display:none">
+          <path d="M104 164 Q120 146 136 164" fill="none" stroke="#1f1c1e" stroke-width="6" stroke-linecap="round"/>
+          <path d="M184 164 Q200 146 216 164" fill="none" stroke="#1f1c1e" stroke-width="6" stroke-linecap="round"/>
+        </g>
+        <g id="px-mouth-smile" class="px">
+          <path d="M150 200 Q160 209 170 200" fill="none" stroke="#1f1c1e" stroke-width="4" stroke-linecap="round"/>
+        </g>
+        <g id="px-mouth-open" class="px" style="display:none">
+          <path d="M146 197 Q160 216 174 197 Q160 204 146 197 Z" fill="#3a2b30"/>
+        </g>
+        <g id="px-mouth-chew" class="px" style="display:none">
+          <ellipse class="fx-chew" cx="160" cy="203" rx="11" ry="9" fill="#3a2b30"/>
+        </g>
+        <g id="px-hearts" class="px" style="display:none" fill="#f48fb8">
+          <path class="fx-heart1" transform="translate(86,58) scale(2)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+          <path class="fx-heart2" transform="translate(232,50) scale(1.5)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+        </g>
+        <g id="px-berry" class="px" style="display:none">
+          <circle cx="218" cy="208" r="14" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4"/>
+          <path transform="translate(218,208) scale(0.6)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z" fill="#ffffff"/>
+        </g>
+      </svg>
+    </div>
+
+    <div id="home-buttons">
+      <button id="btn-feed">🍬 たべさせる (<span id="ui-feed-candy">0</span>)</button>
+      <button id="btn-go" class="big-btn">ぼうけんへ しゅっぱつ! 🚀</button>
+    </div>
+  </section>
+
+  <!-- ぼうけんマップ -->
+  <section id="screen-map" class="screen" hidden>
+    <svg id="map-path" viewBox="0 0 320 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M80 480 Q160 440 230 410 Q300 380 200 330 Q100 280 150 230 Q200 180 160 120" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 22"/>
+    </svg>
+    <div id="map-banner">ワールド1 たべものの森 🍓</div>
+    <div id="map-nodes"></div>
+    <div id="map-progress"></div>
+  </section>
+
+  <!-- ゲーム -->
+  <section id="screen-game" class="screen" hidden>
+    <div id="game-top">
+      <button id="game-quit">✕</button>
+      <span id="game-stage-name"></span>
+      <span id="game-qnum"></span>
+    </div>
+
+    <div id="view-catch" class="gameview" hidden>
+      <button id="btn-speaker">🔊</button>
+      <div id="catch-hint">きいて タッチしてね 👂</div>
+      <div id="catch-choices"></div>
+    </div>
+
+    <div id="view-match" class="gameview" hidden>
+      <div id="match-hint">おなじ ペアを みつけてね 🃏</div>
+      <div id="match-grid"></div>
+    </div>
+
+    <div id="view-result" class="gameview" hidden>
+      <div id="result-mark"></div>
+      <div id="word-card">
+        <div class="pic"></div>
+        <div class="en"></div>
+        <div class="ja"></div>
+        <div class="ph"></div>
+        <button id="btn-replay">🔊 もういちど きく</button>
+      </div>
+      <button id="btn-next" class="big-btn">つぎへ ▶</button>
+    </div>
+
+    <div id="clear-view" class="gameview" hidden>
+      <div id="clear-title">🎉 ステージクリア!</div>
+      <div id="clear-stars"></div>
+      <div id="clear-candy"></div>
+      <div id="clear-buttons">
+        <button id="btn-clear-home" class="big-btn">おうちへ かえって たべさせる 🍬</button>
+        <button id="btn-clear-map">マップへ もどる 🗺️</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ずかん -->
+  <section id="screen-zukan" class="screen" hidden>
+    <div id="zukan-head">
+      <span class="chip">📖 ずかん たべもの</span>
+      <span class="chip">🍬 <span id="zukan-count">0</span>/50</span>
+    </div>
+    <div id="zukan-grid"></div>
+  </section>
+
+  <!-- きせかえ(準備中) -->
+  <section id="screen-dress" class="screen" hidden>
+    <div class="soon">きせかえは じゅんびちゅう 🎀<br>おたのしみに!</div>
+    <img src="assets/baby.svg" alt="ベビー">
+  </section>
+
+  <!-- タブバー -->
+  <nav id="tabbar">
+    <button data-screen="home" class="on">🏠<small>おうち</small></button>
+    <button data-screen="map">🗺️<small>ぼうけん</small></button>
+    <button data-screen="zukan">📖<small>ずかん</small></button>
+    <button data-screen="dress">🎀<small>きせかえ</small></button>
+  </nav>
+
+  <!-- 演出オーバーレイ -->
+  <div id="overlay" hidden>
+    <div class="ov-title"></div>
+    <div class="ov-sub"></div>
+    <img src="assets/baby.svg" alt="" hidden>
+    <button class="big-btn">やったー! 🎉</button>
+  </div>
+
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

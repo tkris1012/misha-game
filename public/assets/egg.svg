@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <clipPath id="eggclip">
+      <path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z"/>
+    </clipPath>
+  </defs>
+  <ellipse cx="160" cy="290" rx="72" ry="12" fill="#f3d8e6"/>
+  <path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z" fill="#fdfdfd"/>
+  <g clip-path="url(#eggclip)">
+    <path d="M70 168 L98 148 L126 168 L154 148 L182 168 L210 148 L238 168 L254 156" fill="none" stroke="rgb(218,193,231)" stroke-width="13" stroke-linejoin="round"/>
+    <g fill="rgb(252,195,217)">
+      <path transform="translate(122,96) scale(1.3)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+      <path transform="translate(196,78)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+      <path transform="translate(160,124) scale(0.8)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z"/>
+    </g>
+    <g fill="rgb(190,228,245)">
+      <circle cx="104" cy="212" r="8"/>
+      <circle cx="160" cy="230" r="8"/>
+      <circle cx="216" cy="206" r="8"/>
+    </g>
+    <g fill="rgb(252,235,170)">
+      <path transform="translate(136,254)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"/>
+      <path transform="translate(198,244) scale(0.8)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"/>
+      <path transform="translate(160,62) scale(0.7)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"/>
+    </g>
+  </g>
+  <path d="M160 40 C212 40 244 105 244 172 C244 238 206 284 160 284 C114 284 76 238 76 172 C76 105 108 40 160 40 Z" fill="none" stroke="#1f1c1e" stroke-width="5"/>
+</svg>

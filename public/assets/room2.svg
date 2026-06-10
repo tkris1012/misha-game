@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 560">
+  <rect x="0" y="0" width="320" height="400" fill="#fdeef5"/>
+  <rect x="0" y="400" width="320" height="160" fill="#f7e6da"/>
+  <line x1="0" y1="400" x2="320" y2="400" stroke="#1f1c1e" stroke-width="4"/>
+  <g id="window">
+    <rect x="88" y="70" width="144" height="120" rx="6" fill="#ffffff" stroke="#1f1c1e" stroke-width="5"/>
+    <rect x="96" y="78" width="128" height="104" fill="#dcf0fb"/>
+    <line x1="160" y1="78" x2="160" y2="182" stroke="#1f1c1e" stroke-width="3"/>
+    <line x1="96" y1="130" x2="224" y2="130" stroke="#1f1c1e" stroke-width="3"/>
+    <path d="M84 66 Q96 130 88 194 L104 194 Q110 130 102 70 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M236 66 Q224 130 232 194 L216 194 Q210 130 218 70 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <g id="frame">
+    <rect x="36" y="252" width="48" height="48" rx="6" fill="#ffffff" stroke="#1f1c1e" stroke-width="4"/>
+    <path transform="translate(60,278) scale(1.5)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z" fill="rgb(252,195,217)"/>
+  </g>
+  <g id="shelf">
+    <rect x="208" y="262" width="88" height="9" rx="4" fill="#ffffff" stroke="#1f1c1e" stroke-width="4"/>
+    <path transform="translate(230,246) scale(1.6)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z" fill="rgb(252,235,170)" stroke="#1f1c1e" stroke-width="2"/>
+    <rect x="256" y="236" width="12" height="26" rx="2" fill="rgb(190,228,245)" stroke="#1f1c1e" stroke-width="3"/>
+    <rect x="271" y="240" width="11" height="22" rx="2" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="3"/>
+  </g>
+  <g id="rug">
+    <ellipse cx="170" cy="520" rx="88" ry="24" fill="rgb(218,193,231)" stroke="#1f1c1e" stroke-width="4"/>
+    <ellipse cx="170" cy="518" rx="64" ry="15" fill="none" stroke="#ffffff" stroke-width="3"/>
+  </g>
+  <g id="cushion">
+    <ellipse cx="90" cy="455" rx="55" ry="25" fill="rgb(253,214,232)" stroke="#1f1c1e" stroke-width="4"/>
+    <path transform="translate(90,451) scale(1.7)" d="M0 4 C-8 -4 -4 -12 0 -7 C4 -12 8 -4 0 4 Z" fill="#ffffff"/>
+  </g>
+  <g id="plant">
+    <path d="M255 430 L285 430 L280 457 L260 457 Z" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="4" stroke-linejoin="round"/>
+    <ellipse cx="262" cy="415" rx="8" ry="14" transform="rotate(-24 262 415)" fill="#c9e8c9" stroke="#1f1c1e" stroke-width="3.5"/>
+    <ellipse cx="278" cy="415" rx="8" ry="14" transform="rotate(24 278 415)" fill="#c9e8c9" stroke="#1f1c1e" stroke-width="3.5"/>
+    <ellipse cx="270" cy="407" rx="8" ry="16" fill="#c9e8c9" stroke="#1f1c1e" stroke-width="3.5"/>
+    <circle cx="270" cy="397" r="5" fill="rgb(252,195,217)" stroke="#1f1c1e" stroke-width="3"/>
+  </g>
+</svg>
