@@ -255,6 +255,24 @@ button {
 #screen-dress .soon { margin-top: 16vh; font-size: 17px; font-weight: bold; }
 #screen-dress img { width: 50%; max-width: 200px; margin-top: 24px; }
 
+/* ---------- エフェクト ---------- */
+.particle {
+  position: absolute; z-index: 60; pointer-events: none;
+  font-size: 20px; transform: translate(-50%, -50%);
+}
+.flash-fx {
+  position: absolute; inset: 0; background: #fff;
+  z-index: 55; pointer-events: none; opacity: 0;
+}
+@keyframes popin {
+  0% { transform: scale(.3); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop-in { animation: popin .35s ease-out; }
+
+#unicorn-wrap img { width: 100%; display: block; }
+
 /* ---------- ログイン ---------- */
 #screen-login {
   background: linear-gradient(160deg, #ffe3ef 0%, #f3e3ff 60%, #e3f5ff 100%);

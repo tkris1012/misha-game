@@ -17,6 +17,8 @@ const DAY = 86400000;
 /* ---------- アカウント & セーブデータ ---------- */
 const ACCOUNTS = ['test', 'みしな'];
 const LOGIN_KEY = 'misha-login';
+const HATCH_FED = 5;    // 卵 → ベビー: たべさせた回数
+const EVOLVE_FED = 50;  // ベビー → ユニコーン(成体): たべさせた回数(仮)
 let account = null;
 const DEFAULT_STATE = () => ({
   m: {},        // 単語id → 習熟度0〜5
@@ -24,7 +26,9 @@ const DEFAULT_STATE = () => ({
   candies: 0,   // ことばのみ
   fed: 0,       // たべさせた回数
   hatched: false,
+  evolved: false, // ユニコーン(成体)へ進化済みか
   cleared: 0,   // クリア済みステージ数(0〜6)
+  lastRoom: 1,  // 部屋レベルアップ演出用
   sound: true,
   rev: 0        // 保存世代(クラウドとの競合解決用)
 });
@@ -103,7 +107,7 @@ function showScreen(name) {
   if (name === 'zukan') renderZukan();
 }
 $$('#tabbar button').forEach((b) => {
-  b.addEventListener('click', () => showScreen(b.dataset.screen));
+  b.addEventListener('click', () => { sfx('pop'); showScreen(b.dataset.screen); });
 });
 
 /* ---------- ホーム ---------- */
@@ -113,20 +117,45 @@ function roomLevel() {
   if (state.cleared >= 2) return 2;
   return 1;
 }
+function partnerStage() {
+  if (!state.hatched) return 'egg';
+  return state.evolved ? 'unicorn' : 'baby';
+}
+function partnerImg() {
+  const st = partnerStage();
+  return st === 'egg' ? 'assets/egg.svg' : st === 'baby' ? 'assets/baby.svg' : 'assets/unicorn.svg';
+}
 function renderHome() {
-  $('#room-bg').src = 'assets/room' + roomLevel() + '.svg';
+  const lv = roomLevel();
+  $('#room-bg').src = 'assets/room' + lv + '.svg';
   $('#ui-candy').textContent = state.candies;
   $('#ui-words').textContent = learnedCount();
   $('#ui-feed-candy').textContent = state.candies;
-  $('#egg-svg').style.display = state.hatched ? 'none' : '';
-  $('#baby-svg').style.display = state.hatched ? '' : 'none';
+  const stage = partnerStage();
+  $('#egg-svg').style.display = stage === 'egg' ? '' : 'none';
+  $('#baby-svg').style.display = stage === 'baby' ? '' : 'none';
+  $('#unicorn-wrap').style.display = stage === 'unicorn' ? '' : 'none';
   $('#btn-feed').disabled = state.candies <= 0;
   $('#btn-sound').textContent = state.sound ? '🔊' : '🔇';
 
-  if (!state.hatched) {
+  // 部屋レベルアップ演出
+  if ((state.lastRoom || 1) < lv) {
+    state.lastRoom = lv;
+    save();
+    sfx('clear');
+    confetti(22);
+    $('#mission-chip').textContent = 'おへやが かわいくなった! 🎀✨';
+    popIn($('#mission-chip'));
+    showBubbleGreeting();
+    return;
+  }
+
+  if (stage === 'egg') {
     $('#mission-chip').textContent = state.candies > 0
       ? 'たべさせると たまごが そだつよ! 🥚'
       : 'ぼうけんで ことばのみを あつめよう! 🎯';
+  } else if (stage === 'baby') {
+    $('#mission-chip').textContent = 'しんかまで あと ' + Math.max(0, EVOLVE_FED - state.fed) + 'かい たべさせてね ✨';
   } else {
     $('#mission-chip').textContent = 'きょうも いっしょに あそぼう! 🎯';
   }
@@ -167,27 +196,48 @@ setInterval(() => {
 }, 3400);
 
 /* たべさせる */
+function speakYummy() {
+  const learned = WORDS.filter((w) => getM(w.id) > 0);
+  if (learned.length > 0) {
+    const w = learned[Math.floor(Math.random() * learned.length)];
+    speak(w.en + '! Yummy!', 'en-US');
+    $('#bubble').textContent = w.en + '! 😋';
+    $('#bubble').hidden = false;
+  }
+}
 $('#btn-feed').addEventListener('click', () => {
   if (state.candies <= 0) return;
   state.candies--;
   state.fed++;
   save();
+  sfx('candy');
   if (!state.hatched) {
     eggExcite();
-    if (state.fed >= 5) { setTimeout(hatch, 1300); }
-  } else {
+    burstAt($('#egg-svg'), ['🍬', '💖'], 6);
+    if (state.fed >= HATCH_FED) { setTimeout(hatch, 1300); }
+  } else if (!state.evolved) {
     setExpr('eat');
-    const learned = WORDS.filter((w) => getM(w.id) > 0);
+    burstAt($('#baby-svg'), ['🍬', '💖'], 6);
     setTimeout(() => {
       setExpr('joy');
-      if (learned.length > 0) {
-        const w = learned[Math.floor(Math.random() * learned.length)];
-        speak(w.en + '! Yummy!', 'en-US');
-        $('#bubble').textContent = w.en + '! 😋';
-        $('#bubble').hidden = false;
+      speakYummy();
+      if (state.fed >= EVOLVE_FED) {
+        setTimeout(() => { setExpr('normal'); evolve(); }, 1100);
+      } else {
+        setTimeout(() => { setExpr('normal'); renderHome(); }, 1400);
       }
-      setTimeout(() => { setExpr('normal'); renderHome(); }, 1400);
     }, 1500);
+  } else {
+    const u = $('#unicorn-wrap');
+    u.classList.add('anim-hop');
+    u.classList.remove('anim-float');
+    burstAt(u, ['🍬', '💖', '✨'], 10);
+    speakYummy();
+    setTimeout(() => {
+      u.classList.remove('anim-hop');
+      u.classList.add('anim-float');
+      renderHome();
+    }, 1400);
   }
   $('#ui-candy').textContent = state.candies;
   $('#ui-feed-candy').textContent = state.candies;
@@ -205,24 +255,56 @@ function eggExcite() {
     if (!state.hatched) $('#egg-crack').style.display = 'none';
   }, 1200);
 }
-$('#egg-svg').addEventListener('click', eggExcite);
+$('#egg-svg').addEventListener('click', () => { sfx('pop'); eggExcite(); });
 $('#baby-svg').addEventListener('click', () => {
   if (currentExpr !== 'normal') return;
+  sfx('pop');
   setExpr('joy');
+  burstAt($('#baby-svg'), ['💖', '✨'], 6);
   showBubbleGreeting();
   const learned = WORDS.filter((w) => getM(w.id) > 0);
   if (learned.length > 0) speak(learned[Math.floor(Math.random() * learned.length)].en, 'en-US');
   setTimeout(() => setExpr('normal'), 1300);
 });
+$('#unicorn-wrap').addEventListener('click', () => {
+  sfx('pop');
+  const u = $('#unicorn-wrap');
+  u.classList.add('anim-hop');
+  u.classList.remove('anim-float');
+  burstAt(u, ['💖', '✨', '⭐'], 8);
+  showBubbleGreeting();
+  const learned = WORDS.filter((w) => getM(w.id) > 0);
+  if (learned.length > 0) speak(learned[Math.floor(Math.random() * learned.length)].en, 'en-US');
+  setTimeout(() => {
+    u.classList.remove('anim-hop');
+    u.classList.add('anim-float');
+  }, 1300);
+});
 
 function hatch() {
   state.hatched = true;
   save();
-  showOverlay('うまれたよ!! 🦄', 'ベビーユニコーンが なかまに なった!', true, 'やったー! 🎉', () => {
+  flashFx();
+  sfx('fanfare');
+  confetti(30);
+  showOverlay('うまれたよ!! 🦄', 'ベビーユニコーンが なかまに なった!', 'assets/baby.svg', 'やったー! 🎉', () => {
     renderHome();
     setExpr('joy');
     speak('Hello!', 'en-US');
     setTimeout(() => setExpr('normal'), 1600);
+  });
+}
+
+function evolve() {
+  state.evolved = true;
+  save();
+  flashFx(800);
+  sfx('fanfare');
+  confetti(40);
+  showOverlay('しんかした!! ✨🦄✨', 'りっぱな ユニコーンに しんかした! おめでとう!', 'assets/unicorn.svg', 'かっこいい! ✨', () => {
+    renderHome();
+    burstAt($('#unicorn-wrap'), ['💖', '✨', '⭐'], 14);
+    speak('I am a unicorn!', 'en-US');
   });
 }
 
@@ -234,15 +316,18 @@ $('#btn-sound').addEventListener('click', () => {
   $('#btn-sound').textContent = state.sound ? '🔊' : '🔇';
 });
 
-$('#btn-go').addEventListener('click', () => showScreen('map'));
+$('#btn-go').addEventListener('click', () => { sfx('pop'); showScreen('map'); });
 
 /* ---------- オーバーレイ ---------- */
-function showOverlay(title, sub, withBaby, btnText, onClose) {
+function showOverlay(title, sub, imgSrc, btnText, onClose) {
   $('#overlay .ov-title').textContent = title;
   $('#overlay .ov-sub').textContent = sub;
-  $('#overlay img').hidden = !withBaby;
+  $('#overlay img').hidden = !imgSrc;
+  if (imgSrc) $('#overlay img').src = imgSrc;
   $('#overlay button').textContent = btnText;
   $('#overlay').hidden = false;
+  popIn($('#overlay .ov-title'));
+  popIn($('#overlay img'));
   $('#overlay button').onclick = () => {
     $('#overlay').hidden = true;
     if (onClose) onClose();
@@ -347,12 +432,15 @@ function nextCatchQuestion() {
       answered = true;
       if (c.id === w.id) {
         b.classList.add('correct');
+        sfx('correct');
+        burstAt(b, ['💖', '⭐', '✨'], 10);
         srsCorrect(w.id);
         G.candies++;
         G.correct++;
         setTimeout(() => showResult(w, true), 550);
       } else {
         b.classList.add('wrong', 'shake');
+        sfx('wrong');
         srsWrong(w.id);
         grid.querySelectorAll('.choice').forEach((el, i2) => {
           if (choices[i2].id === w.id) el.classList.add('correct');
@@ -371,6 +459,8 @@ function nextCatchQuestion() {
 function showResult(w, ok) {
   showGameView('view-result');
   $('#result-mark').textContent = ok ? '💮 せいかい!' : 'おしい! こたえは…';
+  popIn($('#result-mark'));
+  popIn($('#word-card'));
   $('#word-card .pic').textContent = w.e;
   $('#word-card .en').textContent = w.en;
   $('#word-card .ja').textContent = w.ja;
@@ -431,6 +521,8 @@ function startMatchRound() {
       if (a.dataset.id === b.dataset.id && a.dataset.kind !== b.dataset.kind) {
         a.classList.add('got');
         b.classList.add('got');
+        sfx('correct');
+        burstAt(b, ['💖', '✨'], 8);
         const w = wordById(cd.id);
         srsCorrect(w.id);
         G.candies++;
@@ -443,6 +535,7 @@ function startMatchRound() {
         }
       } else {
         lockBoard = true;
+        sfx('wrong');
         setTimeout(() => {
           closeCard();
           a.classList.remove('open', 'word');
@@ -467,11 +560,16 @@ function stageClear() {
   $('#clear-title').textContent = isBoss ? '👑 ワールドクリア!!' : '🎉 ステージクリア!';
   $('#clear-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
   $('#clear-candy').textContent = '🍬 ことばのみ ×' + G.candies + ' ゲット!';
+  popIn($('#clear-title'));
+  popIn($('#clear-stars'));
+  sfx('clear');
+  confetti(isBoss ? 40 : 26);
   speak('Great job!', 'en-US');
   if (isBoss) {
     setTimeout(() => {
-      showOverlay('たべものの森 コンプリート! 🍓', 'おへやが ゆめかわプリンセスルームに なった!', true, 'すごーい! 🎀', () => showScreen('home'));
-    }, 800);
+      sfx('fanfare');
+      showOverlay('たべものの森 コンプリート! 🍓', 'おへやが ゆめかわプリンセスルームに なった!', partnerImg(), 'すごーい! 🎀', () => showScreen('home'));
+    }, 900);
   }
 }
 $('#btn-clear-home').addEventListener('click', () => showScreen('home'));
@@ -489,6 +587,8 @@ function renderZukan() {
       c.className = 'zcard' + (m >= 2 ? ' gold' : '');
       c.innerHTML = '<div class="pic">' + w.e + '</div><div class="w">' + w.en + (m >= 2 ? ' ⭐' : '') + '</div><div class="j">' + w.ja + '</div>';
       c.addEventListener('click', () => {
+        sfx('pop');
+        burstAt(c, ['💖', '✨'], 5);
         speakWord(w, true);
         setTimeout(() => speak(w.ja, 'ja-JP'), 2600);
       });
