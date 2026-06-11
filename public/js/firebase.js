@@ -6,16 +6,16 @@
  * FIREBASE_CONFIG が空のときはクラウド同期を無効化し、ローカル保存のみで動作する。
  */
 const FIREBASE_CONFIG = {
-  projectId: '',  // ← Firebaseプロジェクトの projectId
-  apiKey: ''      // ← ウェブAPIキー
+  projectId: 'misha-game',
+  apiKey: ''  // ルールで保護されたREST読み書きにはAPIキー不要
 };
 
-const cloudEnabled = () => !!(FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.apiKey);
+const cloudEnabled = () => !!FIREBASE_CONFIG.projectId;
 
 function fsDocUrl(id) {
   return 'https://firestore.googleapis.com/v1/projects/' + FIREBASE_CONFIG.projectId +
     '/databases/(default)/documents/misha-saves/' + encodeURIComponent(id) +
-    '?key=' + FIREBASE_CONFIG.apiKey;
+    (FIREBASE_CONFIG.apiKey ? '?key=' + FIREBASE_CONFIG.apiKey : '');
 }
 
 async function cloudLoad(id) {
