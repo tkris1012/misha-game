@@ -14,22 +14,43 @@ const shuffle = (arr) => {
 };
 const DAY = 86400000;
 
-/* ---------- セーブデータ ---------- */
-const SAVE_KEY = 'misha-save-v1';
-let state = {
+/* ---------- アカウント & セーブデータ ---------- */
+const ACCOUNTS = ['test', 'みしな'];
+const LOGIN_KEY = 'misha-login';
+let account = null;
+const DEFAULT_STATE = () => ({
   m: {},        // 単語id → 習熟度0〜5
   due: {},      // 単語id → 次回復習時刻
   candies: 0,   // ことばのみ
   fed: 0,       // たべさせた回数
   hatched: false,
   cleared: 0,   // クリア済みステージ数(0〜6)
-  sound: true
-};
-function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
-function load() {
+  sound: true,
+  rev: 0        // 保存世代(クラウドとの競合解決用)
+});
+let state = DEFAULT_STATE();
+const saveKey = () => 'misha-save-v1:' + account;
+
+let cloudTimer = null;
+function save() {
+  state.rev = (state.rev || 0) + 1;
+  localStorage.setItem(saveKey(), JSON.stringify(state));
+  if (cloudEnabled() && account) {
+    clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(() => { cloudSave(account, state).catch(() => {}); }, 1200);
+  }
+}
+function loadLocal() {
+  state = DEFAULT_STATE();
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) state = Object.assign(state, JSON.parse(raw));
+    const rawAcc = localStorage.getItem(saveKey());
+    const rawOld = rawAcc ? null : localStorage.getItem('misha-save-v1'); // アカウント導入前のデータ引き継ぎ
+    const raw = rawAcc || rawOld;
+    if (raw) state = Object.assign(DEFAULT_STATE(), JSON.parse(raw));
+    if (rawOld) {
+      localStorage.setItem(saveKey(), rawOld);
+      localStorage.removeItem('misha-save-v1');
+    }
   } catch (e) { /* 壊れたセーブは初期化 */ }
 }
 const getM = (id) => state.m[id] || 0;
@@ -75,6 +96,7 @@ if ('speechSynthesis' in window) speechSynthesis.getVoices();
 function showScreen(name) {
   $$('.screen').forEach((s) => { s.hidden = true; });
   $('#screen-' + name).hidden = false;
+  $('#tabbar').style.display = (name === 'login') ? 'none' : '';
   $$('#tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.screen === name));
   if (name === 'home') renderHome();
   if (name === 'map') renderMap();
@@ -478,6 +500,63 @@ function renderZukan() {
   });
 }
 
+/* ---------- ログイン ---------- */
+function setLoginMsg(text, ok) {
+  $('#login-msg').textContent = text;
+  $('#login-msg').classList.toggle('ok', !!ok);
+}
+
+async function doLogin(id) {
+  account = id;
+  localStorage.setItem(LOGIN_KEY, id);
+  loadLocal();
+  if (cloudEnabled()) {
+    setLoginMsg('クラウドから よみこみちゅう… ☁️', true);
+    try {
+      const cloud = await cloudLoad(id);
+      if (cloud && (cloud.rev || 0) >= (state.rev || 0)) {
+        state = Object.assign(DEFAULT_STATE(), cloud);
+        localStorage.setItem(saveKey(), JSON.stringify(state));
+      } else if ((state.rev || 0) > 0) {
+        cloudSave(id, state).catch(() => {});
+      }
+      setLoginMsg('', true);
+    } catch (e) {
+      setLoginMsg('クラウドに つながらなかったよ(このたんまつに ほぞんするね)', false);
+    }
+  }
+  $('#btn-account').textContent = '👤 ' + id;
+  showScreen('home');
+}
+
+$('#btn-login').addEventListener('click', () => {
+  const id = $('#login-id').value.trim();
+  if (!ACCOUNTS.includes(id)) {
+    setLoginMsg('その IDは ないよ 🥺', false);
+    return;
+  }
+  setLoginMsg('', true);
+  doLogin(id);
+});
+$('#login-id').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $('#btn-login').click();
+});
+
+$('#btn-account').addEventListener('click', () => {
+  if (!confirm('アカウントを きりかえる?\n(データは ほぞんされるよ)')) return;
+  speechSynthesis.cancel();
+  clearTimeout(cloudTimer);
+  if (cloudEnabled() && account) cloudSave(account, state).catch(() => {});
+  account = null;
+  localStorage.removeItem(LOGIN_KEY);
+  $('#login-id').value = '';
+  setLoginMsg('', true);
+  showScreen('login');
+});
+
 /* ---------- 起動 ---------- */
-load();
-showScreen('home');
+(() => {
+  const savedId = localStorage.getItem(LOGIN_KEY);
+  if (savedId && ACCOUNTS.includes(savedId)) doLogin(savedId);
+  else showScreen('login');
+})();

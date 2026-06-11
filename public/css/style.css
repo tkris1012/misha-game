@@ -255,6 +255,29 @@ button {
 #screen-dress .soon { margin-top: 16vh; font-size: 17px; font-weight: bold; }
 #screen-dress img { width: 50%; max-width: 200px; margin-top: 24px; }
 
+/* ---------- ログイン ---------- */
+#screen-login {
+  background: linear-gradient(160deg, #ffe3ef 0%, #f3e3ff 60%, #e3f5ff 100%);
+  z-index: 40; padding-bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+#screen-login[hidden] { display: none; }
+#login-box { text-align: center; width: 80%; max-width: 300px; }
+#login-title { font-size: 28px; font-weight: bold; color: #e85c9e; text-shadow: 2px 2px 0 #fff; }
+#login-sub { font-size: 13px; font-weight: bold; margin-top: 4px; }
+#login-box img { width: 45%; max-width: 150px; margin: 14px 0 6px; }
+#login-label { font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+#login-id {
+  width: 100%; font-family: inherit; font-size: 18px; font-weight: bold;
+  text-align: center; color: #4a3b40;
+  background: #fff; border: 3.5px solid #1f1c1e; border-radius: 999px;
+  padding: 10px 16px; outline: none;
+}
+#login-id:focus { box-shadow: 0 0 0 4px #ffd7e8; }
+#btn-login { margin-top: 12px; width: 100%; }
+#login-msg { font-size: 13px; font-weight: bold; margin-top: 10px; min-height: 20px; color: #d9534f; }
+#login-msg.ok { color: #5e8c64; }
+
 /* ---------- オーバーレイ演出 ---------- */
 #overlay {
   position: absolute; inset: 0; z-index: 30;
