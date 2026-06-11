@@ -98,6 +98,33 @@ function flashFx(dur) {
   setTimeout(() => d.remove(), dur || 650);
 }
 
+/* 食べ物がキャラの口へ飛んでいく演出 */
+function foodFly(targetEl, emoji, mouthYRatio) {
+  const app = document.getElementById('app');
+  if (!app || !targetEl) return;
+  const ar = app.getBoundingClientRect();
+  const r = targetEl.getBoundingClientRect();
+  const sx = r.left - ar.left + r.width * 0.92;
+  const sy = r.top - ar.top + r.height * 0.85;
+  const ex = r.left - ar.left + r.width * 0.5;
+  const ey = r.top - ar.top + r.height * (mouthYRatio || 0.62);
+  const s = document.createElement('span');
+  s.className = 'particle';
+  s.style.fontSize = '34px';
+  s.textContent = emoji;
+  s.style.left = sx + 'px';
+  s.style.top = sy + 'px';
+  app.appendChild(s);
+  const dx = ex - sx;
+  const dy = ey - sy;
+  s.animate([
+    { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 1 },
+    { transform: 'translate(calc(-50% + ' + (dx * 0.55) + 'px), calc(-50% + ' + (dy - 46) + 'px)) scale(1.1)', opacity: 1, offset: 0.55 },
+    { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(0.15)', opacity: 0 }
+  ], { duration: 950, easing: 'ease-in-out' });
+  setTimeout(() => s.remove(), 950);
+}
+
 /* ぽよんと出る演出(同じ要素で何度でも再生できる) */
 function popIn(el) {
   if (!el) return;

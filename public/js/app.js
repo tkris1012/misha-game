@@ -23,7 +23,8 @@ let account = null;
 const DEFAULT_STATE = () => ({
   m: {},        // 単語id → 習熟度0〜5
   due: {},      // 単語id → 次回復習時刻
-  candies: 0,   // ことばのみ
+  pantry: {},   // 単語id → 持っている食べ物の数(ことばのみ)
+  candies: 0,   // 旧形式の通貨(pantryへ移行済み・互換用)
   fed: 0,       // たべさせた回数
   hatched: false,
   evolved: false, // ユニコーン(成体)へ進化済みか
@@ -32,6 +33,27 @@ const DEFAULT_STATE = () => ({
   sound: true,
   rev: 0        // 保存世代(クラウドとの競合解決用)
 });
+
+/* 旧セーブ(candies通貨)を食べ物インベントリへ移行 */
+function migrateState() {
+  if (!state.pantry) state.pantry = {};
+  if (state.candies > 0) {
+    const learned = WORDS.filter((w) => getM(w.id) > 0);
+    if (learned.length > 0) {
+      let i = 0;
+      while (state.candies > 0) {
+        const id = learned[i % learned.length].id;
+        state.pantry[id] = (state.pantry[id] || 0) + 1;
+        state.candies--;
+        i++;
+      }
+    } else {
+      state.candies = 0;
+    }
+  }
+}
+const pantryTotal = () => Object.values(state.pantry || {}).reduce((a, b) => a + b, 0);
+const addFood = (id) => { state.pantry[id] = (state.pantry[id] || 0) + 1; };
 let state = DEFAULT_STATE();
 const saveKey = () => 'misha-save-v1:' + account;
 
@@ -56,6 +78,7 @@ function loadLocal() {
       localStorage.removeItem('misha-save-v1');
     }
   } catch (e) { /* 壊れたセーブは初期化 */ }
+  migrateState();
 }
 const getM = (id) => state.m[id] || 0;
 const learnedCount = () => WORDS.filter((w) => getM(w.id) > 0).length;
@@ -128,14 +151,14 @@ function partnerImg() {
 function renderHome() {
   const lv = roomLevel();
   $('#room-bg').src = 'assets/room' + lv + '.svg';
-  $('#ui-candy').textContent = state.candies;
+  $('#ui-candy').textContent = pantryTotal();
   $('#ui-words').textContent = learnedCount();
-  $('#ui-feed-candy').textContent = state.candies;
+  $('#ui-feed-candy').textContent = pantryTotal();
   const stage = partnerStage();
   $('#egg-svg').style.display = stage === 'egg' ? '' : 'none';
   $('#baby-svg').style.display = stage === 'baby' ? '' : 'none';
   $('#unicorn-wrap').style.display = stage === 'unicorn' ? '' : 'none';
-  $('#btn-feed').disabled = state.candies <= 0;
+  $('#btn-feed').disabled = pantryTotal() <= 0;
   $('#btn-sound').textContent = state.sound ? '🔊' : '🔇';
 
   // 部屋レベルアップ演出
@@ -151,9 +174,9 @@ function renderHome() {
   }
 
   if (stage === 'egg') {
-    $('#mission-chip').textContent = state.candies > 0
+    $('#mission-chip').textContent = pantryTotal() > 0
       ? 'たべさせると たまごが そだつよ! 🥚'
-      : 'ぼうけんで ことばのみを あつめよう! 🎯';
+      : 'ぼうけんで たべものを あつめよう! 🎯';
   } else if (stage === 'baby') {
     $('#mission-chip').textContent = 'しんかまで あと ' + Math.max(0, EVOLVE_FED - state.fed) + 'かい たべさせてね ✨';
   } else {
@@ -178,7 +201,7 @@ function showBubbleGreeting() {
 const EXPR = {
   normal: ['px-eyes-open', 'px-mouth-smile'],
   joy: ['px-eyes-happy', 'px-mouth-open', 'px-hearts'],
-  eat: ['px-eyes-open', 'px-mouth-chew', 'px-berry'],
+  eat: ['px-eyes-open', 'px-mouth-chew'],
   blink: ['px-eyes-blink', 'px-mouth-smile']
 };
 let currentExpr = 'normal';
@@ -195,54 +218,93 @@ setInterval(() => {
   setTimeout(() => { if (currentExpr === 'blink') setExpr('normal'); }, 140);
 }, 3400);
 
-/* たべさせる */
-function speakYummy() {
-  const learned = WORDS.filter((w) => getM(w.id) > 0);
-  if (learned.length > 0) {
-    const w = learned[Math.floor(Math.random() * learned.length)];
-    speak(w.en + '! Yummy!', 'en-US');
-    $('#bubble').textContent = w.en + '! 😋';
-    $('#bubble').hidden = false;
-  }
+/* たべさせる(ゲットした食べ物から選ぶ) */
+function buildFoodPicker() {
+  const grid = $('#food-picker-grid');
+  grid.innerHTML = '';
+  WORDS.forEach((w) => {
+    const c = state.pantry[w.id] || 0;
+    if (c <= 0) return;
+    const b = document.createElement('button');
+    b.className = 'food-item';
+    b.innerHTML = w.e + '<span class="nm">' + w.en + '</span><span class="cnt">×' + c + '</span>';
+    b.addEventListener('click', () => pickFood(w.id));
+    grid.appendChild(b);
+  });
+}
+function openFoodPicker() {
+  buildFoodPicker();
+  $('#food-picker').hidden = false;
+}
+function closeFoodPicker() {
+  $('#food-picker').hidden = true;
 }
 $('#btn-feed').addEventListener('click', () => {
-  if (state.candies <= 0) return;
-  state.candies--;
+  if (pantryTotal() <= 0) return;
+  sfx('pop');
+  openFoodPicker();
+});
+$('#food-picker-close').addEventListener('click', () => { sfx('pop'); closeFoodPicker(); });
+
+let feeding = false;
+function pickFood(id) {
+  if (feeding || (state.pantry[id] || 0) <= 0) return;
+  feeding = true;
+  closeFoodPicker();
+  state.pantry[id]--;
   state.fed++;
   save();
   sfx('candy');
+  const w = wordById(id);
+  $('#ui-candy').textContent = pantryTotal();
+  $('#ui-feed-candy').textContent = pantryTotal();
+  $('#btn-feed').disabled = pantryTotal() <= 0;
+
+  const munch = () => {
+    speak(w.en + '! Yummy!', 'en-US');
+    $('#bubble').textContent = w.e + ' ' + w.en + '! 😋';
+    $('#bubble').hidden = false;
+  };
+
   if (!state.hatched) {
-    eggExcite();
-    burstAt($('#egg-svg'), ['🍬', '💖'], 6);
-    if (state.fed >= HATCH_FED) { setTimeout(hatch, 1300); }
+    foodFly($('#egg-svg'), w.e, 0.5);
+    setTimeout(eggExcite, 700);
+    setTimeout(() => {
+      feeding = false;
+      if (state.fed >= HATCH_FED) hatch();
+      else renderHome();
+    }, 1900);
   } else if (!state.evolved) {
-    setExpr('eat');
-    burstAt($('#baby-svg'), ['🍬', '💖'], 6);
+    foodFly($('#baby-svg'), w.e, 0.63);
+    setTimeout(() => setExpr('eat'), 600);
     setTimeout(() => {
       setExpr('joy');
-      speakYummy();
-      if (state.fed >= EVOLVE_FED) {
-        setTimeout(() => { setExpr('normal'); evolve(); }, 1100);
-      } else {
-        setTimeout(() => { setExpr('normal'); renderHome(); }, 1400);
-      }
-    }, 1500);
+      burstAt($('#baby-svg'), ['💖', '✨'], 8);
+      munch();
+      setTimeout(() => {
+        setExpr('normal');
+        feeding = false;
+        if (state.fed >= EVOLVE_FED) evolve();
+        else renderHome();
+      }, 1300);
+    }, 1900);
   } else {
     const u = $('#unicorn-wrap');
-    u.classList.add('anim-hop');
-    u.classList.remove('anim-float');
-    burstAt(u, ['🍬', '💖', '✨'], 10);
-    speakYummy();
+    foodFly(u, w.e, 0.6);
+    setTimeout(() => {
+      u.classList.add('anim-hop');
+      u.classList.remove('anim-float');
+      burstAt(u, ['💖', '✨'], 8);
+      munch();
+    }, 900);
     setTimeout(() => {
       u.classList.remove('anim-hop');
       u.classList.add('anim-float');
+      feeding = false;
       renderHome();
-    }, 1400);
+    }, 2200);
   }
-  $('#ui-candy').textContent = state.candies;
-  $('#ui-feed-candy').textContent = state.candies;
-  $('#btn-feed').disabled = state.candies <= 0;
-});
+}
 
 function eggExcite() {
   const egg = $('#egg-svg');
@@ -433,8 +495,9 @@ function nextCatchQuestion() {
       if (c.id === w.id) {
         b.classList.add('correct');
         sfx('correct');
-        burstAt(b, ['💖', '⭐', '✨'], 10);
+        burstAt(b, [w.e, '💖', '✨'], 10);
         srsCorrect(w.id);
+        addFood(w.id);
         G.candies++;
         G.correct++;
         setTimeout(() => showResult(w, true), 550);
@@ -522,9 +585,10 @@ function startMatchRound() {
         a.classList.add('got');
         b.classList.add('got');
         sfx('correct');
-        burstAt(b, ['💖', '✨'], 8);
         const w = wordById(cd.id);
+        burstAt(b, [w.e, '💖', '✨'], 8);
         srsCorrect(w.id);
+        addFood(w.id);
         G.candies++;
         G.correct++;
         save();
@@ -553,13 +617,12 @@ function stageClear() {
   const isBoss = STAGES[G.idx].type === 'boss';
   const rate = G.correct / Math.max(1, G.total);
   const stars = rate >= 0.9 ? 3 : rate >= 0.7 ? 2 : 1;
-  state.candies += G.candies;
   if (G.idx === state.cleared) state.cleared++;
   save();
   showGameView('clear-view');
   $('#clear-title').textContent = isBoss ? '👑 ワールドクリア!!' : '🎉 ステージクリア!';
   $('#clear-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-  $('#clear-candy').textContent = '🍬 ことばのみ ×' + G.candies + ' ゲット!';
+  $('#clear-candy').textContent = '🍎 たべもの ×' + G.candies + ' ゲット! たべさせてあげよう!';
   popIn($('#clear-title'));
   popIn($('#clear-stars'));
   sfx('clear');
@@ -616,6 +679,7 @@ async function doLogin(id) {
       const cloud = await cloudLoad(id);
       if (cloud && (cloud.rev || 0) >= (state.rev || 0)) {
         state = Object.assign(DEFAULT_STATE(), cloud);
+        migrateState();
         localStorage.setItem(saveKey(), JSON.stringify(state));
       } else if ((state.rev || 0) > 0) {
         cloudSave(id, state).catch(() => {});
